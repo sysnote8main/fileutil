@@ -23,13 +23,7 @@ func DownloadParallel(urls []string, concurrentSize int64, folderPath string) {
 	wg.Wait()
 }
 
-func downloadFromURL(_url string, wg *sync.WaitGroup, s *semaphore.Weighted, folderPath string) (*int64, error) {
-	defer wg.Done()
-	if err := s.Acquire(context.Background(), 1); err != nil {
-		return nil, err
-	}
-	defer s.Release(1)
-
+func Download(_url, folderPath string) (*int64, error) {
 	u, err := url.Parse(_url)
 	if err != nil {
 		return nil, err
@@ -53,6 +47,15 @@ func downloadFromURL(_url string, wg *sync.WaitGroup, s *semaphore.Weighted, fol
 		return nil, err
 	}
 	return &size, nil
+}
+
+func downloadFromURL(_url string, wg *sync.WaitGroup, s *semaphore.Weighted, folderPath string) (*int64, error) {
+	defer wg.Done()
+	if err := s.Acquire(context.Background(), 1); err != nil {
+		return nil, err
+	}
+	defer s.Release(1)
+	return Download(_url, folderPath)
 }
 
 func extractFileNameFromURL(url string) string {
