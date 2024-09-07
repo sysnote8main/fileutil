@@ -1,4 +1,4 @@
-package synutil
+package fileutil
 
 import "os"
 
